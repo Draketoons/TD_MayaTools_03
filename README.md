@@ -1,6 +1,6 @@
 # Maya Plugins
 
-this is a collection of maya plugins with rigging and other things
+this is a collection of maya plugins to help with rigging and other things
 
 ## Limb Rigger
 
