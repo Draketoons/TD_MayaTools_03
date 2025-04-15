@@ -4,6 +4,8 @@ this is a collection of maya plugins with rigging and other things
 
 ## Limb Rigger
 
+<img src="assets/LimbRiggingToolCapture.PNG">
+
 Rigs any 3 joint limb
 * Automatically finds the selected joints
 * Can adjust controller  size
