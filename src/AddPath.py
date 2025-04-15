@@ -1,2 +1,2 @@
 import sys
-sys.path.append("D:/profile redirect/msclark1/Desktop/MayaTools/src")
+sys.path.append("D:/profile redirect/msclark1/Documents/GitHub/TD_MayaTools_03/src")
