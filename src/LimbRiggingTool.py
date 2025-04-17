@@ -206,8 +206,8 @@ class LimbRigToolWidget(QMayaWindow):
         print("Set Color Button Clicked!")
         color = self.colorPicker.color
         self.rigger.controllerColor = (color.redF(), color.greenF(), color.blueF())
-        ctrl = mc.ls(sl=True, type="nurbsCurve")[0]
-        self.rigger.ApplyControllerColor(ctrl)
+        ctrl = mc.ls(sl=True)
+        self.rigger.ApplyControllerColor(ctrl[0])
 
     def AutoFindBtnClicked(self):
         try:
