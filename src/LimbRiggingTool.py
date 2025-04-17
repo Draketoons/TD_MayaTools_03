@@ -183,6 +183,11 @@ class LimbRigToolWidget(QMayaWindow):
         self.colorPicker = ColorPicker()
         self.masterLayout.addWidget(self.colorPicker)
 
+        self.setColorBtn = QPushButton("Set Ctrl Color")
+        self.masterLayout.addWidget(self.setColorBtn)
+        self.setColorBtn.clicked.connect(self.SetColorBtnClicked)
+
+
         self.rigLimbBtn = QPushButton("Rig Limb")
         self.masterLayout.addWidget(self.rigLimbBtn)
         self.rigLimbBtn.clicked.connect(self.RigLimbBtnClicked)
@@ -196,6 +201,13 @@ class LimbRigToolWidget(QMayaWindow):
         color = self.colorPicker.color
         self.rigger.controllerColor = (color.redF(), color.greenF(), color.blueF())
         self.rigger.RigLimb()
+
+    def SetColorBtnClicked(self):
+        print("Set Color Button Clicked!")
+        color = self.colorPicker.color
+        self.rigger.controllerColor = (color.redF(), color.greenF(), color.blueF())
+        ctrl = mc.ls(sl=True, type="nurbsCurve")[0]
+        self.rigger.ApplyControllerColor(ctrl)
 
     def AutoFindBtnClicked(self):
         try:
