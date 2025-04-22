@@ -5,8 +5,10 @@ from PySide2.QtWidgets import (QVBoxLayout,
                                QPushButton,
                                QMessageBox,
                                QListWidget,
-                               QLabel,)
+                               QLabel,
+                               QFileDialog)
 from PySide2.QtGui import QIntValidator, QRegExpValidator
+from PySide2.QtCore import Signal
 from MayaUtils import *
 import maya.cmds as mc
 
@@ -30,10 +32,17 @@ class MayaToUE:
         self.rootJnt = ""
         self.meshes = []
         self.animationClips : list[AnimClip] = []
+        self.fileName = ""
+        self.saveDir = ""
     
     def AddNewAnimEntry(self):
         self.animationClips.append(AnimClip())
+        print(f"Animation clip added, anim clips: {len(self.animationClips)}")
         return self.animationClips[-1]
+    
+    def RemoveAnimClip(self, clipToRemove: AnimClip):
+        self.animationClips.remove(clipToRemove)
+        print(f"animation clip removed, anim clips left: {len(self.animationClips)}")
     
     def SetSelectedAsRootJnt(self):
         selection = mc.ls(sl=True)
@@ -77,6 +86,7 @@ class MayaToUE:
         self.meshes = list(meshes)
 
 class AnimClipEntryWidget(QWidget):
+    entryRemoved = Signal(AnimClip)
     def __init__(self, animClip: AnimClip):
         super().__init__()
         self.animClip = animClip
@@ -119,6 +129,7 @@ class AnimClipEntryWidget(QWidget):
         self.masterLayout.addWidget(deleteBtn)
 
     def DeleteButtonClicked(self):
+        self.entryRemoved.emit(self.animClip)
         self.deleteLater()
 
     def SetRangeBtnClicked(self):
@@ -177,11 +188,46 @@ class MayaToUEWidget(QMayaWindow):
 
         self.animEntryLayout = QVBoxLayout()
         self.masterLayout.addLayout(self.animEntryLayout)
+
+        self.saveFileLayout = QVBoxLayout()
+        self.masterLayout.addLayout(self.saveFileLayout)
+        fileNameLabel = QLabel("File Name:")
+        self.saveFileLayout.addWidget(fileNameLabel)
+
+        self.fileNameLine = QLineEdit()
+        self.fileNameLine.setValidator(QRegExpValidator("\w+"))
+        self.fileNameLine.textChanged.connect(self.FileNameLineChanged)
+        self.saveFileLayout.addWidget(self.fileNameLine)
+
+        self.directoryLabel = QLabel("Save Directory: ")
+        self.saveFileLayout.addWidget(self.directoryLabel)
+        self.saveDirectoryLine = QLineEdit()
+        self.saveDirectoryLine.setEnabled(False)
+        self.saveFileLayout.addWidget(self.saveDirectoryLine)
+        self.pickDirBtn = QPushButton("...")
+        self.pickDirBtn.clicked.connect(self.PickDirBtnClicked)
+        self.saveFileLayout.addWidget(self.pickDirBtn)
+
+    @TryAction
+    def PickDirBtnClicked(self):
+        path = QFileDialog().getExistingDirectory()
+        self.saveDirectoryLine.setText(path)
+        self.mayaToUE.saveDir = path
+
+    @TryAction
+    def FileNameLineChanged(self, newSavePath):
+        self.mayaToUE.savePath = newSavePath
     
+    @TryAction
     def AddNewAnimClipEntrybtnClicked(self):
         newEntry = self.mayaToUE.AddNewAnimEntry()
-        self.animEntryLayout.addWidget(AnimClipEntryWidget(newEntry))
-
+        newEntryWidget = AnimClipEntryWidget(newEntry)
+        newEntryWidget.entryRemoved.connect(self.AnimClipEntryRemoved)
+        self.animEntryLayout.addWidget(newEntryWidget)
+    
+    @TryAction
+    def AnimClipEntryRemoved(self, animClip: AnimClip):
+        self.mayaToUE.RemoveAnimClip(animClip)
     
     @TryAction
     def AddMeshButtonClicked(self):
