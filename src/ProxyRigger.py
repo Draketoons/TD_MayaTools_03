@@ -141,5 +141,6 @@ class ProxyRiggerWidget(QMayaWindow):
     def GetWindowHash(self):
         return "2401e835b25f8769cba309ce93c2b157"
 
-proxyRiggerWidget = ProxyRiggerWidget()
-proxyRiggerWidget.show()
+def Run():
+    proxyRiggerWidget = ProxyRiggerWidget()
+    proxyRiggerWidget.show()
