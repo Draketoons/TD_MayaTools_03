@@ -1,4 +1,5 @@
 import os
+import TD_MayaTools_03
 from PySide2.QtWidgets import (QVBoxLayout,
                                QHBoxLayout,
                                QCheckBox,
@@ -12,6 +13,7 @@ from PySide2.QtGui import QIntValidator, QRegExpValidator
 from PySide2.QtCore import Signal
 from MayaUtils import *
 import maya.cmds as mc
+import remote_execution
 
 def TryAction(action):
     def wrapper(*args, **kwargs):
@@ -77,6 +79,29 @@ class MayaToUE:
 
             mc.playbackOptions(e=True, min = startFrame, max = endFrame)
             mc.FBXExport('-f', animExportPath, '-s', True, '-ea', True)
+    
+        self.SendToUnreal()
+    
+    def SendToUnreal(self):
+        ueUtilPath = os.path.join(TD_MayaTools_03.srcDir, "UnrealUtils.py")
+        ueUtilPath = os.path.normpath(ueUtilPath)
+
+        meshPath = self.GetSkeletalMeshSavePath().replace("\\","/")
+        animDir = self.GetAnimDirPath().replace("\\","/")
+
+        command = []
+        with open(ueUtilPath, 'r') as ueUtilityFile:
+            commands = ueUtilityFile.readlines()
+
+        commands.append(f"\nImportMeshAndAnimation(\'{meshPath}\', \'{animDir}\')")
+        command = "".join(commands)
+        print(command)
+
+        uRemoteExec = remote_execution.RemoteExecution()
+        uRemoteExec.start()
+        uRemoteExec.open_command_connection(uRemoteExec.remote_nodes)
+        uRemoteExec.run_command(command)
+        uRemoteExec.stop()
     
     def GetAnimDirPath(self):
         path = os.path.join(self.saveDir, "Animations")

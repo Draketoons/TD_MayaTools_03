@@ -54,4 +54,4 @@ def ImportMeshAndAnimation(meshPath, animDir):
             animPath = os.path.join(animDir, fileName)
             ImportAnimation(mesh, animPath)
 
-ImportMeshAndAnimation("D:/profile redirect/msclark1/Desktop/MayaToUE_Exports/Alex_mtu_V003.fbx","D:/profile redirect/msclark1/Desktop/MayaToUE_Exports/Animations")
+# ImportMeshAndAnimation("D:/profile redirect/msclark1/Desktop/MayaToUE_Exports/Alex_mtu_V003.fbx","D:/profile redirect/msclark1/Desktop/MayaToUE_Exports/Animations")
